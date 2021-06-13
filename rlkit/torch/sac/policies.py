@@ -5,7 +5,7 @@ from torch import nn as nn
 from rlkit.policies.base import ExplorationPolicy, Policy
 from rlkit.torch.core import eval_np
 from rlkit.torch.distributions import TanhNormal
-from rlkit.torch.networks import Mlp
+from rlkit.torch.networks import Mlp, PMOEMlp
 
 
 LOG_SIG_MAX = 2
@@ -124,7 +124,7 @@ class TanhGaussianPolicy(Mlp, ExplorationPolicy):
         )
 
 
-class TanhMultiGaussianPolicy(Mlp, ExplorationPolicy):
+class TanhPMOEGaussianPolicy(PMOEMlp, ExplorationPolicy):
     """
     Usage:
 
@@ -194,10 +194,12 @@ class TanhMultiGaussianPolicy(Mlp, ExplorationPolicy):
         for i, fc in enumerate(self.fcs):
             h = self.hidden_activation(fc(h))
         mean = self.last_fc(h)
+        mean = mean.reshape(mean.shape[0], -1, self.k)
         if self.std is None:
             log_std = self.last_fc_log_std(h)
             log_std = torch.clamp(log_std, LOG_SIG_MIN, LOG_SIG_MAX)
             std = torch.exp(log_std)
+            std = std.reshape(std.shape[0], -1, self.k)
         else:
             std = self.std
             log_std = self.log_std
@@ -234,7 +236,7 @@ class TanhMultiGaussianPolicy(Mlp, ExplorationPolicy):
                     action = tanh_normal.sample()
 
         return (
-            action, mean, log_std, log_prob, entropy, std,
+            mixing_coefficient, action, mean, log_std, log_prob, entropy, std,
             mean_action_log_prob, pre_tanh_value,
         )
 

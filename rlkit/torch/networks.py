@@ -88,7 +88,7 @@ class FlattenMlp(Mlp):
         return super().forward(flat_inputs, **kwargs)
 
 
-class MultiMlp(nn.Module):
+class PMOEMlp(nn.Module):
     def __init__(
             self,
             hidden_sizes,
@@ -153,6 +153,29 @@ class MultiMlp(nn.Module):
             return [output, mixing_coefficient], preactivation
         else:
             return [output, mixing_coefficient]
+
+
+class FlattenPMOEMlp(Mlp):
+    """
+    Flatten inputs along dimension 1 and then pass through MLP.
+    """
+
+    def forward(self, *inputs, **kwargs):
+        action = inputs[0]
+        observation = inputs[1]
+        k = 0
+        if "Critic_Repeat" in kwargs and kwargs["Critic_Repeat"]:
+            k = action.shape[1]
+            observation = observation.unsqueeze(1).repeat(1, k, 1).reshpae(-1, observation.shape[-1])
+            action = action.reshape(-1, action.shape[-1])
+            inputs = [action, observation]
+
+        flat_inputs = torch.cat(inputs, dim=1)
+        out = super().forward(flat_inputs, **kwargs)
+        if k == 0:
+            return out
+        else:
+            return out.reshape(-1, k)
 
 
 class MlpPolicy(Mlp, Policy):
