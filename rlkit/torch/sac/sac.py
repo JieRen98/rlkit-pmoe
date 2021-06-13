@@ -323,7 +323,7 @@ class PMOESACTrainer(TorchTrainer):
         )
 
         q_new_actions, best_index = torch.max(q_new_actions, 1)
-        log_pi = torch.gather(log_pi, 1, best_index.unsqueeze(-1).unsqueeze(-1).repeat(1, 1, log_pi.shape[-1]))
+        log_pi = torch.gather(log_pi, 1, best_index.unsqueeze(-1))
         log_pi = log_pi.squeeze(1)
 
         if self.use_automatic_entropy_tuning:
@@ -341,9 +341,6 @@ class PMOESACTrainer(TorchTrainer):
         """
         QF Loss
         """
-        choose_index = Categorical(new_mixing_coefficient).sample()
-        actions = torch.gather(actions, 1, choose_index.unsqueeze(-1).unsqueeze(-1).repeat(1, 1, log_pi.shape[-1]))
-        actions = actions.squeeze(1)
 
         q1_pred = self.qf1(obs, actions)
         q2_pred = self.qf2(obs, actions)
@@ -351,12 +348,21 @@ class PMOESACTrainer(TorchTrainer):
         new_next_mixing_coefficient, new_next_actions, _, _, new_log_pi, *_ = self.policy(
             next_obs, reparameterize=True, return_log_prob=True,
         )
+
+        choose_index = Categorical(new_next_mixing_coefficient).sample().unsqueeze(-1)
+        new_next_actions = torch.gather(new_next_actions,
+                                        1,
+                                        choose_index.unsqueeze(-1).repeat(1, 1, new_next_actions.shape[-1]))
+        new_next_actions = new_next_actions.squeeze(1)
+
+        new_log_pi = torch.gather(new_log_pi, 1, choose_index)
+
         target_q_values = torch.min(
             self.target_qf1(next_obs, new_next_actions),
             self.target_qf2(next_obs, new_next_actions),
         ) - alpha * new_log_pi
 
-        target_q_values, _ = target_q_values.max()
+        # target_q_values, _ = target_q_values.max()
 
         q_target = self.reward_scale * rewards + (1. - terminals) * self.discount * target_q_values
         qf1_loss = self.qf_criterion(q1_pred, q_target.detach())

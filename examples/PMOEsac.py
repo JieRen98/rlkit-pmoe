@@ -1,4 +1,5 @@
-from gym.envs.mujoco import HalfCheetahEnv
+# from gym.envs.mujoco import HalfCheetahEnv
+from gym.envs.box2d import LunarLanderContinuous as env
 
 import rlkit.torch.pytorch_util as ptu
 from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
@@ -13,8 +14,8 @@ from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
 
 def experiment(variant):
-    expl_env = NormalizedBoxEnv(HalfCheetahEnv())
-    eval_env = NormalizedBoxEnv(HalfCheetahEnv())
+    expl_env = NormalizedBoxEnv(env())
+    eval_env = NormalizedBoxEnv(env())
     obs_dim = expl_env.observation_space.low.size
     action_dim = eval_env.action_space.low.size
 
@@ -84,7 +85,7 @@ def experiment(variant):
 if __name__ == "__main__":
     # noinspection PyTypeChecker
     variant = dict(
-        algorithm="SAC",
+        algorithm="PMOESAC",
         version="normal",
         layer_size=256,
         replay_buffer_size=int(1E6),
@@ -105,8 +106,9 @@ if __name__ == "__main__":
             qf_lr=3E-4,
             reward_scale=1,
             use_automatic_entropy_tuning=True,
+            k=4
         ),
     )
     setup_logger('name-of-experiment', variant=variant)
-    # ptu.set_gpu_mode(True)  # optionally set the GPU (default=False)
+    ptu.set_gpu_mode(True)  # optionally set the GPU (default=False)
     experiment(variant)

@@ -63,7 +63,7 @@ class Mlp(nn.Module):
         self.last_fc.weight.data.uniform_(-init_w, init_w)
         self.last_fc.bias.data.uniform_(-init_w, init_w)
 
-    def forward(self, input, return_preactivations=False):
+    def forward(self, input, return_preactivations=False, **kwargs):
         h = input
         for i, fc in enumerate(self.fcs):
             h = fc(h)
@@ -134,9 +134,9 @@ class PMOEMlp(nn.Module):
         self.last_fc = nn.Linear(in_size, output_size * k)
         self.last_fc.weight.data.uniform_(-init_w, init_w)
         self.last_fc.bias.data.uniform_(-init_w, init_w)
-        self.mixing_coefficient_fc = nn.Linear(in_size, k)
-        self.mixing_coefficient_fc.weight.data.uniform_(-init_w, init_w)
-        self.mixing_coefficient_fc.bias.data.uniform_(-init_w, init_w)
+        self.mixing_coefficient_fc = nn.Sequential(nn.Linear(self.input_size, 64),
+                                                   nn.ReLU(),
+                                                   nn.Linear(64, k))
 
     def forward(self, input, return_preactivations=False):
         h = input
@@ -161,12 +161,12 @@ class FlattenPMOEMlp(Mlp):
     """
 
     def forward(self, *inputs, **kwargs):
-        action = inputs[0]
-        observation = inputs[1]
+        observation = inputs[0]
+        action = inputs[1]
         k = 0
         if "Critic_Repeat" in kwargs and kwargs["Critic_Repeat"]:
             k = action.shape[1]
-            observation = observation.unsqueeze(1).repeat(1, k, 1).reshpae(-1, observation.shape[-1])
+            observation = observation.unsqueeze(1).repeat(1, k, 1).reshape(-1, observation.shape[-1])
             action = action.reshape(-1, action.shape[-1])
             inputs = [action, observation]
 
