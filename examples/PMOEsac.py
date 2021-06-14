@@ -45,6 +45,7 @@ def experiment(variant):
         obs_dim=obs_dim,
         action_dim=action_dim,
         hidden_sizes=[M, M],
+        k=variant['trainer_kwargs']['k']
     )
     eval_policy = MakeDeterministic(policy)
     eval_path_collector = MdpPathCollector(
