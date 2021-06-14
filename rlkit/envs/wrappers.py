@@ -1,10 +1,10 @@
-import numpy as np
 import itertools
+from collections import deque
+
+import numpy as np
 from gym import Env
 from gym.spaces import Box
 from gym.spaces import Discrete
-
-from collections import deque
 
 
 class ProxyEnv(Env):

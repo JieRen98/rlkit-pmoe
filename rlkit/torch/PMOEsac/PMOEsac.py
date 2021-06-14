@@ -5,12 +5,11 @@ import torch
 import torch.optim as optim
 from torch import nn as nn
 from torch.distributions import Categorical
+from torch.nn import functional as f
 
 import rlkit.torch.pytorch_util as ptu
 from rlkit.core.eval_util import create_stats_ordered_dict
 from rlkit.torch.torch_rl_algorithm import TorchTrainer
-
-from torch.nn import functional as f
 
 
 class PMOESACTrainer(TorchTrainer):

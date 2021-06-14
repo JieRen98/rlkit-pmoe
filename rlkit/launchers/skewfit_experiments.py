@@ -1,12 +1,12 @@
+import os.path as osp
 import time
-from multiworld.core.image_env import ImageEnv
-from rlkit.core import logger
-from rlkit.envs.vae_wrapper import temporary_mode
 
 import cv2
 import numpy as np
-import os.path as osp
+from multiworld.core.image_env import ImageEnv
 
+from rlkit.core import logger
+from rlkit.envs.vae_wrapper import temporary_mode
 from rlkit.samplers.data_collector.vae_env import (
     VAEWrappedEnvPathCollector,
 )

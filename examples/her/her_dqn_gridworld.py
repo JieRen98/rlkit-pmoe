@@ -12,9 +12,8 @@ from rlkit.exploration_strategies.base import \
     PolicyWrappedWithExplorationStrategy
 from rlkit.exploration_strategies.epsilon_greedy import EpsilonGreedy
 from rlkit.launchers.launcher_util import setup_logger
-from rlkit.samplers.data_collector import GoalConditionedPathCollector
-
 from rlkit.policies.argmax import ArgmaxDiscretePolicy
+from rlkit.samplers.data_collector import GoalConditionedPathCollector
 from rlkit.torch.dqn.dqn import DQNTrainer
 from rlkit.torch.her.her import HERTrainer
 from rlkit.torch.networks import FlattenMlp

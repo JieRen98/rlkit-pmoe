@@ -1,8 +1,8 @@
 from collections import deque, OrderedDict
 
 from rlkit.core.eval_util import create_stats_ordered_dict
-from rlkit.samplers.rollout_functions import rollout, multitask_rollout
 from rlkit.samplers.data_collector.base import PathCollector
+from rlkit.samplers.rollout_functions import rollout, multitask_rollout
 
 
 class MdpPathCollector(PathCollector):

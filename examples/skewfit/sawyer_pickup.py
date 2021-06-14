@@ -1,12 +1,12 @@
+from multiworld.envs.mujoco.cameras import (
+    sawyer_pick_and_place_camera,
+)
+
+import rlkit.torch.vae.vae_schedules as vae_schedules
 import rlkit.util.hyperparameter as hyp
 from rlkit.envs.goal_generation.pickup_goal_dataset import (
     generate_vae_dataset,
     get_image_presampled_goals_from_vae_env,
-)
-
-import rlkit.torch.vae.vae_schedules as vae_schedules
-from multiworld.envs.mujoco.cameras import (
-    sawyer_pick_and_place_camera,
 )
 from rlkit.launchers.launcher_util import run_experiment
 from rlkit.launchers.skewfit_experiments import skewfit_full_experiment
