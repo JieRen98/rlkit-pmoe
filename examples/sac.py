@@ -1,5 +1,3 @@
-# from gym.envs.mujoco import HalfCheetahEnv
-# from gym.envs.box2d import LunarLanderContinuous as env
 from gym.envs.classic_control import PendulumEnv as env
 
 import rlkit.torch.pytorch_util as ptu

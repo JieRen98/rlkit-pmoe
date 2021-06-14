@@ -1,5 +1,3 @@
-# from gym.envs.mujoco import HalfCheetahEnv
-# from gym.envs.box2d import LunarLanderContinuous as env
 from gym.envs.classic_control import PendulumEnv as env
 
 import rlkit.torch.pytorch_util as ptu
@@ -87,7 +85,7 @@ def experiment(variant):
 if __name__ == "__main__":
     # noinspection PyTypeChecker
     variant = dict(
-        algorithm="PMOESAC",
+        algorithm="PMOEsac",
         version="normal",
         layer_size=256,
         replay_buffer_size=int(1E6),
