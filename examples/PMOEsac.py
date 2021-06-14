@@ -7,7 +7,7 @@ from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
 from rlkit.envs.wrappers import NormalizedBoxEnv
 from rlkit.launchers.launcher_util import setup_logger
 from rlkit.samplers.data_collector import MdpPathCollector
-from rlkit.torch.sac.policies import MakeDeterministic
+from rlkit.torch.PMOEsac.policies import MakeDeterministic
 from rlkit.torch.PMOEsac.policies import TanhPMOEGaussianPolicy
 from rlkit.torch.PMOEsac.PMOEsac import PMOESACTrainer
 from rlkit.torch.networks import FlattenPMOEMlp as FlattenMlp

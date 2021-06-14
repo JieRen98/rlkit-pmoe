@@ -5,7 +5,7 @@ from torch import nn as nn
 from rlkit.policies.base import ExplorationPolicy, Policy
 from rlkit.torch.core import eval_np
 from rlkit.torch.distributions import TanhNormal
-from rlkit.torch.networks import Mlp, PMOEMlp
+from rlkit.torch.networks import Mlp
 
 
 LOG_SIG_MAX = 2
