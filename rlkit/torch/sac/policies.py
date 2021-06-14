@@ -213,7 +213,7 @@ class TanhPMOEGaussianPolicy(PMOEMlp, ExplorationPolicy):
         mean_action_log_prob = None
         pre_tanh_value = None
 
-        mixing_coefficient = torch.softmax(self.mixing_coefficient_fc(obs), 1)
+        mixing_coefficient = torch.softmax(self.mixing_coefficient_fc(h.detach()), 1)
 
         if deterministic:
             action = torch.tanh(mean)

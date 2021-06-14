@@ -134,9 +134,9 @@ class PMOEMlp(nn.Module):
         self.last_fc = nn.Linear(in_size, output_size * k)
         self.last_fc.weight.data.uniform_(-init_w, init_w)
         self.last_fc.bias.data.uniform_(-init_w, init_w)
-        self.mixing_coefficient_fc = nn.Sequential(nn.Linear(self.input_size, 64),
+        self.mixing_coefficient_fc = nn.Sequential(nn.Linear(in_size, 32),
                                                    nn.ReLU(),
-                                                   nn.Linear(64, k))
+                                                   nn.Linear(32, k))
 
     def forward(self, input, return_preactivations=False):
         h = input
