@@ -8,7 +8,7 @@ from rlkit.samplers.data_collector import MdpPathCollector
 from rlkit.torch.PMOEsac.PMOEsac import PMOESACTrainer
 from rlkit.torch.PMOEsac.policies import MakeDeterministic
 from rlkit.torch.PMOEsac.policies import TanhPMOEGaussianPolicy
-from rlkit.torch.networks import FlattenPMOEMlp as FlattenMlp
+from rlkit.torch.networks import FlattenPMOEMlp
 from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
 
@@ -19,22 +19,22 @@ def experiment(variant):
     action_dim = eval_env.action_space.low.size
 
     M = variant['layer_size']
-    qf1 = FlattenMlp(
+    qf1 = FlattenPMOEMlp(
         input_size=obs_dim + action_dim,
         output_size=1,
         hidden_sizes=[M, M],
     )
-    qf2 = FlattenMlp(
+    qf2 = FlattenPMOEMlp(
         input_size=obs_dim + action_dim,
         output_size=1,
         hidden_sizes=[M, M],
     )
-    target_qf1 = FlattenMlp(
+    target_qf1 = FlattenPMOEMlp(
         input_size=obs_dim + action_dim,
         output_size=1,
         hidden_sizes=[M, M],
     )
-    target_qf2 = FlattenMlp(
+    target_qf2 = FlattenPMOEMlp(
         input_size=obs_dim + action_dim,
         output_size=1,
         hidden_sizes=[M, M],
