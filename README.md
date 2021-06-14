@@ -1,7 +1,11 @@
-# RLkit
+# RLkit-PMOE
 Reinforcement learning framework and algorithms implemented in PyTorch.
 
+In addition, this repo includes the official implementation of Probabilistic Mixture-of-Expert (PMOE) on RLkit. Thanks to all the contributor of RLkit.
+
 Implemented algorithms:
+ - PMOE
+    - [paper]()
  - Skew-Fit
     - [example script](examples/skewfit/sawyer_door.py)
     - [paper](https://arxiv.org/abs/1903.03698)
