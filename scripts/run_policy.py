@@ -30,7 +30,7 @@ def simulate_policy(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', type=str, default="/home/renjie/PycharmProjects/rlkit-pmoe/data/PendulumEnv/PendulumEnv_2021_06_14_14_02_27_0000--s-0/params.pkl",
+    parser.add_argument('--file', type=str, default="/PATH/params.pkl",
                         help='path to the snapshot file')
     parser.add_argument('--H', type=int, default=300,
                         help='Max length of rollout')
