@@ -100,8 +100,6 @@ class PMOESACTrainer(TorchTrainer):
             obs, reparameterize=True, return_log_prob=True,
         )
 
-        if len(new_obs_actions.shape) == 3:
-            new_obs_actions = new_obs_actions.squeeze(1)
         q_new_actions = torch.min(
             self.qf1(obs, new_obs_actions, Critic_Repeat=True),
             self.qf2(obs, new_obs_actions, Critic_Repeat=True),
