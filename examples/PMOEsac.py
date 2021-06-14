@@ -8,8 +8,8 @@ from rlkit.envs.wrappers import NormalizedBoxEnv
 from rlkit.launchers.launcher_util import setup_logger
 from rlkit.samplers.data_collector import MdpPathCollector
 from rlkit.torch.sac.policies import MakeDeterministic
-from rlkit.torch.sac.policies import TanhPMOEGaussianPolicy as TanhGaussianPolicy
-from rlkit.torch.sac.sac import PMOESACTrainer as SACTrainer
+from rlkit.torch.PMOEsac.policies import TanhPMOEGaussianPolicy
+from rlkit.torch.PMOEsac.PMOEsac import PMOESACTrainer
 from rlkit.torch.networks import FlattenPMOEMlp as FlattenMlp
 from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
@@ -41,7 +41,7 @@ def experiment(variant):
         output_size=1,
         hidden_sizes=[M, M],
     )
-    policy = TanhGaussianPolicy(
+    policy = TanhPMOEGaussianPolicy(
         obs_dim=obs_dim,
         action_dim=action_dim,
         hidden_sizes=[M, M],
@@ -60,7 +60,7 @@ def experiment(variant):
         variant['replay_buffer_size'],
         expl_env,
     )
-    trainer = SACTrainer(
+    trainer = PMOESACTrainer(
         env=eval_env,
         policy=policy,
         qf1=qf1,

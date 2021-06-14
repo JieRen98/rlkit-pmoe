@@ -12,7 +12,7 @@ LOG_SIG_MAX = 2
 LOG_SIG_MIN = -20
 
 
-class TanhGaussianPolicy(Mlp, ExplorationPolicy):
+class TanhPMOEGaussianPolicy(PMOEMlp, ExplorationPolicy):
     """
     Usage:
 
@@ -52,7 +52,7 @@ class TanhGaussianPolicy(Mlp, ExplorationPolicy):
             last_hidden_size = obs_dim
             if len(hidden_sizes) > 0:
                 last_hidden_size = hidden_sizes[-1]
-            self.last_fc_log_std = nn.Linear(last_hidden_size, action_dim)
+            self.last_fc_log_std = nn.Linear(last_hidden_size, action_dim * self.k)
             self.last_fc_log_std.weight.data.uniform_(-init_w, init_w)
             self.last_fc_log_std.bias.data.uniform_(-init_w, init_w)
         else:
@@ -64,7 +64,11 @@ class TanhGaussianPolicy(Mlp, ExplorationPolicy):
         return actions[0, :], {}
 
     def get_actions(self, obs_np, deterministic=False):
-        return eval_np(self, obs_np, deterministic=deterministic)[0]
+        out = eval_np(self, obs_np, deterministic=deterministic)
+        mixing_coefficient = out[4][0]
+        index = np.random.choice(self.k, p=mixing_coefficient)
+        return out[0][:, index]
+
 
     def forward(
             self,
@@ -82,10 +86,12 @@ class TanhGaussianPolicy(Mlp, ExplorationPolicy):
         for i, fc in enumerate(self.fcs):
             h = self.hidden_activation(fc(h))
         mean = self.last_fc(h)
+        mean = mean.reshape(mean.shape[0], self.k, -1)
         if self.std is None:
             log_std = self.last_fc_log_std(h)
             log_std = torch.clamp(log_std, LOG_SIG_MIN, LOG_SIG_MAX)
             std = torch.exp(log_std)
+            std = std.reshape(std.shape[0], self.k, -1)
         else:
             std = self.std
             log_std = self.log_std
@@ -94,6 +100,9 @@ class TanhGaussianPolicy(Mlp, ExplorationPolicy):
         entropy = None
         mean_action_log_prob = None
         pre_tanh_value = None
+
+        mixing_coefficient = torch.softmax(self.mixing_coefficient_fc(h.detach()), 1)
+
         if deterministic:
             action = torch.tanh(mean)
         else:
@@ -111,7 +120,7 @@ class TanhGaussianPolicy(Mlp, ExplorationPolicy):
                     action,
                     pre_tanh_value=pre_tanh_value
                 )
-                log_prob = log_prob.sum(dim=1, keepdim=True)
+                log_prob = log_prob.sum(dim=2)
             else:
                 if reparameterize is True:
                     action = tanh_normal.rsample()
@@ -119,7 +128,7 @@ class TanhGaussianPolicy(Mlp, ExplorationPolicy):
                     action = tanh_normal.sample()
 
         return (
-            action, mean, log_std, log_prob, entropy, std,
+            action, mean, log_std, log_prob, mixing_coefficient, entropy, std,
             mean_action_log_prob, pre_tanh_value,
         )
 

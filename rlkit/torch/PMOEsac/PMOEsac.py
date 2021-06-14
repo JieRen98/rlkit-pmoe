@@ -13,7 +13,7 @@ from rlkit.torch.torch_rl_algorithm import TorchTrainer
 from torch.nn import functional as f
 
 
-class SACTrainer(TorchTrainer):
+class PMOESACTrainer(TorchTrainer):
     def __init__(
             self,
             env,
@@ -97,9 +97,21 @@ class SACTrainer(TorchTrainer):
         """
         Policy and Alpha Loss
         """
-        new_obs_actions, policy_mean, policy_log_std, log_pi, *_ = self.policy(
+        new_obs_actions, policy_mean, policy_log_std, log_pi, new_mixing_coefficient, *_ = self.policy(
             obs, reparameterize=True, return_log_prob=True,
         )
+
+        if len(new_obs_actions.shape) == 3:
+            new_obs_actions = new_obs_actions.squeeze(1)
+        q_new_actions = torch.min(
+            self.qf1(obs, new_obs_actions, Critic_Repeat=True),
+            self.qf2(obs, new_obs_actions, Critic_Repeat=True),
+        )
+
+        q_new_actions, best_index = torch.max(q_new_actions, 1)
+        log_pi = torch.gather(log_pi, 1, best_index.unsqueeze(-1))
+        log_pi = log_pi.squeeze(1)
+
         if self.use_automatic_entropy_tuning:
             alpha_loss = -(self.log_alpha * (log_pi + self.target_entropy).detach()).mean()
             self.alpha_optimizer.zero_grad()
@@ -110,27 +122,39 @@ class SACTrainer(TorchTrainer):
             alpha_loss = 0
             alpha = 1
 
-        q_new_actions = torch.min(
-            self.qf1(obs, new_obs_actions),
-            self.qf2(obs, new_obs_actions),
-        )
-        policy_loss = (alpha*log_pi - q_new_actions).mean()
+        mixing_coefficient_loss = f.mse_loss(f.one_hot(best_index, self.k).float(), new_mixing_coefficient)
+
+        policy_loss = (alpha*log_pi - q_new_actions).mean() + mixing_coefficient_loss
 
         """
         QF Loss
         """
+
+        with torch.no_grad():
+            # Make sure policy accounts for squashing functions like tanh correctly!
+            new_next_actions, _, _, new_log_pi, new_next_mixing_coefficient, *_ = self.policy(
+                next_obs, reparameterize=True, return_log_prob=True,
+            )
+
+            choose_index = Categorical(new_next_mixing_coefficient).sample().unsqueeze(-1)
+            if len(new_next_actions.shape) == 2:
+                new_next_actions = new_next_actions.unsqueeze(1)
+            new_next_actions = torch.gather(new_next_actions,
+                                            1,
+                                            choose_index.unsqueeze(-1).repeat(1, 1, new_next_actions.shape[-1]))
+            new_next_actions = new_next_actions.squeeze(1)
+
+            new_log_pi = torch.gather(new_log_pi, 1, choose_index)
+
+            target_q_values = torch.min(
+                self.target_qf1(next_obs, new_next_actions),
+                self.target_qf2(next_obs, new_next_actions),
+            ) - alpha * new_log_pi
+
+            q_target = self.reward_scale * rewards + (1. - terminals) * self.discount * target_q_values
+
         q1_pred = self.qf1(obs, actions)
         q2_pred = self.qf2(obs, actions)
-        # Make sure policy accounts for squashing functions like tanh correctly!
-        new_next_actions, _, _, new_log_pi, *_ = self.policy(
-            next_obs, reparameterize=True, return_log_prob=True,
-        )
-        target_q_values = torch.min(
-            self.target_qf1(next_obs, new_next_actions),
-            self.target_qf2(next_obs, new_next_actions),
-        ) - alpha * new_log_pi
-
-        q_target = self.reward_scale * rewards + (1. - terminals) * self.discount * target_q_values
         qf1_loss = self.qf_criterion(q1_pred, q_target.detach())
         qf2_loss = self.qf_criterion(q2_pred, q_target.detach())
 
