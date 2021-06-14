@@ -139,7 +139,7 @@ class NormalizedBoxEnv(ProxyEnv):
         self._reward_scale = reward_scale
         self._obs_mean = obs_mean
         self._obs_std = obs_std
-        ub = np.ones(self._wrapped_env.action_space.shape)
+        ub = np.ones(self._wrapped_env.action_space.shape, dtype=np.float32)
         self.action_space = Box(-1 * ub, ub)
 
     def estimate_obs_stats(self, obs_batch, override_values=False):
