@@ -336,7 +336,9 @@ class PMOESACTrainer(TorchTrainer):
             alpha_loss = 0
             alpha = 1
 
-        policy_loss = (alpha*log_pi - q_new_actions).mean()
+        mixing_coefficient_loss = ((torch.nn.functional.one_hot(best_index, self.k) - new_mixing_coefficient) ** 2).sum(1)
+
+        policy_loss = (mixing_coefficient_loss + alpha*log_pi - q_new_actions).mean()
 
         """
         QF Loss
@@ -361,8 +363,6 @@ class PMOESACTrainer(TorchTrainer):
             self.target_qf1(next_obs, new_next_actions),
             self.target_qf2(next_obs, new_next_actions),
         ) - alpha * new_log_pi
-
-        # target_q_values, _ = target_q_values.max()
 
         q_target = self.reward_scale * rewards + (1. - terminals) * self.discount * target_q_values
         qf1_loss = self.qf_criterion(q1_pred, q_target.detach())
