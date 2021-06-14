@@ -315,10 +315,12 @@ class PMOESACTrainer(TorchTrainer):
         """
         Policy and Alpha Loss
         """
-        new_mixing_coefficient, new_obs_actions, policy_mean, policy_log_std, log_pi, *_ = self.policy(
+        new_obs_actions, policy_mean, policy_log_std, log_pi, new_mixing_coefficient, *_ = self.policy(
             obs, reparameterize=True, return_log_prob=True,
         )
 
+        if len(new_obs_actions.shape) == 3:
+            new_obs_actions = new_obs_actions.squeeze(1)
         q_new_actions = torch.min(
             self.qf1(obs, new_obs_actions, Critic_Repeat=True),
             self.qf2(obs, new_obs_actions, Critic_Repeat=True),
@@ -348,11 +350,13 @@ class PMOESACTrainer(TorchTrainer):
 
         with torch.no_grad():
             # Make sure policy accounts for squashing functions like tanh correctly!
-            new_next_mixing_coefficient, new_next_actions, _, _, new_log_pi, *_ = self.policy(
+            new_next_actions, _, _, new_log_pi, new_next_mixing_coefficient, *_ = self.policy(
                 next_obs, reparameterize=True, return_log_prob=True,
             )
 
             choose_index = Categorical(new_next_mixing_coefficient).sample().unsqueeze(-1)
+            if len(new_next_actions.shape) == 2:
+                new_next_actions = new_next_actions.unsqueeze(1)
             new_next_actions = torch.gather(new_next_actions,
                                             1,
                                             choose_index.unsqueeze(-1).repeat(1, 1, new_next_actions.shape[-1]))
