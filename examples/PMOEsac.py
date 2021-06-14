@@ -1,5 +1,6 @@
 # from gym.envs.mujoco import HalfCheetahEnv
-from gym.envs.box2d import LunarLanderContinuous as env
+# from gym.envs.box2d import LunarLanderContinuous as env
+from gym.envs.classic_control import PendulumEnv as env
 
 import rlkit.torch.pytorch_util as ptu
 from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
@@ -109,6 +110,6 @@ if __name__ == "__main__":
             k=4
         ),
     )
-    setup_logger('name-of-experiment', variant=variant)
+    setup_logger(env.__name__, variant=variant)
     ptu.set_gpu_mode(True)  # optionally set the GPU (default=False)
     experiment(variant)
