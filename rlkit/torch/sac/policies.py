@@ -177,9 +177,9 @@ class TanhPMOEGaussianPolicy(PMOEMlp, ExplorationPolicy):
 
     def get_actions(self, obs_np, deterministic=False):
         out = eval_np(self, obs_np, deterministic=deterministic)
-        mixing_coefficient = out[0][0]
+        mixing_coefficient = out[4][0]
         index = np.random.choice(self.k, p=mixing_coefficient)
-        return out[1][:, index]
+        return out[0][:, index]
 
 
     def forward(
@@ -240,7 +240,7 @@ class TanhPMOEGaussianPolicy(PMOEMlp, ExplorationPolicy):
                     action = tanh_normal.sample()
 
         return (
-            mixing_coefficient, action, mean, log_std, log_prob, entropy, std,
+            action, mean, log_std, log_prob, mixing_coefficient, entropy, std,
             mean_action_log_prob, pre_tanh_value,
         )
 
