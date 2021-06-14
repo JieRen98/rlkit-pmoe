@@ -31,6 +31,7 @@ class Mlp(nn.Module):
             b_init_value=0.1,
             layer_norm=False,
             layer_norm_kwargs=None,
+            **kwargs,
     ):
         super().__init__()
 
@@ -134,9 +135,7 @@ class PMOEMlp(nn.Module):
         self.last_fc = nn.Linear(in_size, output_size * k)
         self.last_fc.weight.data.uniform_(-init_w, init_w)
         self.last_fc.bias.data.uniform_(-init_w, init_w)
-        self.mixing_coefficient_fc = nn.Sequential(nn.Linear(in_size, 32),
-                                                   nn.ReLU(),
-                                                   nn.Linear(32, k))
+        self.mixing_coefficient_fc = nn.Linear(in_size, k)
 
     def forward(self, input, return_preactivations=False):
         h = input
@@ -150,9 +149,9 @@ class PMOEMlp(nn.Module):
         output = output.reshape(output.shape[0], self.k, -1)
         mixing_coefficient = torch.softmax(self.mixing_coefficient_fc(h), 1)
         if return_preactivations:
-            return [output, mixing_coefficient], preactivation
+            return [mixing_coefficient, output], preactivation
         else:
-            return [output, mixing_coefficient]
+            return [mixing_coefficient, output]
 
 
 class FlattenPMOEMlp(Mlp):
