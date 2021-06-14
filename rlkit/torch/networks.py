@@ -167,7 +167,7 @@ class FlattenPMOEMlp(Mlp):
             k = action.shape[1]
             observation = observation.unsqueeze(1).repeat(1, k, 1).reshape(-1, observation.shape[-1])
             action = action.reshape(-1, action.shape[-1])
-            inputs = [action, observation]
+            inputs = [observation, action]
 
         flat_inputs = torch.cat(inputs, dim=1)
         out = super().forward(flat_inputs, **kwargs)
