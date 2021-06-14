@@ -96,7 +96,7 @@ class PMOESACTrainer(TorchTrainer):
         """
         Policy and Alpha Loss
         """
-        new_obs_actions, policy_mean, policy_log_std, log_pi, new_mixing_coefficient, *_ = self.policy(
+        new_obs_actions, policy_mean, policy_log_std, log_pi, mixing_coefficient, *_ = self.policy(
             obs, reparameterize=True, return_log_prob=True,
         )
 
@@ -121,9 +121,9 @@ class PMOESACTrainer(TorchTrainer):
             alpha_loss = 0
             alpha = 1
 
-        mixing_coefficient_loss = f.mse_loss(f.one_hot(best_index, self.k).float(), new_mixing_coefficient)
+        mixing_coefficient_loss = f.mse_loss(f.one_hot(best_index, self.k).float(), mixing_coefficient)
 
-        policy_loss = (alpha*log_pi - q_new_actions).mean() + mixing_coefficient_loss
+        policy_loss = (alpha*log_pi - q_new_actions).mean()
 
         """
         QF Loss
@@ -169,7 +169,7 @@ class PMOESACTrainer(TorchTrainer):
         self.qf2_optimizer.step()
 
         self.policy_optimizer.zero_grad()
-        policy_loss.backward()
+        (policy_loss + mixing_coefficient_loss).backward()
         self.policy_optimizer.step()
 
         """
@@ -192,13 +192,11 @@ class PMOESACTrainer(TorchTrainer):
             Eval should set this to None.
             This way, these statistics are only computed for one batch.
             """
-            policy_loss = (log_pi - q_new_actions).mean()
-
             self.eval_statistics['QF1 Loss'] = np.mean(ptu.get_numpy(qf1_loss))
             self.eval_statistics['QF2 Loss'] = np.mean(ptu.get_numpy(qf2_loss))
-            self.eval_statistics['Policy Loss'] = np.mean(ptu.get_numpy(
-                policy_loss
-            ))
+            self.eval_statistics['Policy Loss'] = np.mean(ptu.get_numpy(policy_loss))
+            self.eval_statistics['Mixing Coefficient Loss'] = np.mean(ptu.get_numpy(mixing_coefficient_loss))
+
             self.eval_statistics.update(create_stats_ordered_dict(
                 'Q1 Predictions',
                 ptu.get_numpy(q1_pred),
@@ -222,6 +220,10 @@ class PMOESACTrainer(TorchTrainer):
             self.eval_statistics.update(create_stats_ordered_dict(
                 'Policy log std',
                 ptu.get_numpy(policy_log_std),
+            ))
+            self.eval_statistics.update(create_stats_ordered_dict(
+                'Mixing Coefficient',
+                ptu.get_numpy(mixing_coefficient),
             ))
             if self.use_automatic_entropy_tuning:
                 self.eval_statistics['Alpha'] = alpha.item()
