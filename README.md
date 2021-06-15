@@ -160,15 +160,6 @@ This requires some knowledge of AWS and/or GCP, which is beyond the scope of
 this README.
 To learn more, more about `doodad`, [go to the repository](https://github.com/vitchyr/doodad/), which is based on [this original repository](https://github.com/justinjfu/doodad/).
 
-# Requests for pull-requests
- - Implement policy-gradient algorithms.
- - Implement model-based algorithms.
-
-# Legacy Code (v0.1.2)
-For Temporal Difference Models (TDMs) and the original implementation of 
-Reinforcement Learning with Imagined Goals (RIG), run
-`git checkout tags/v0.1.2`.
-
 # References
 The algorithms are based on the following papers
 
