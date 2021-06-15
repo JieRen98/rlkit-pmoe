@@ -226,6 +226,9 @@ Reinforcement Learning with Imagined Goals (RIG), run
 # References
 The algorithms are based on the following papers
 
+[Probabilistic Mixture-of-Experts for Efficient Deep Reinforcement Learning](https://arxiv.org/abs/2104.09122).  
+Jie Ren*, Yewen Li*, Zihan Ding, Wei Pan, Hao Dong. arXiv preprint, 2021.
+
 [Skew-Fit: State-Covering Self-Supervised Reinforcement Learning](https://arxiv.org/abs/1903.03698).  
 Vitchyr H. Pong*, Murtaza Dalal*, Steven Lin*, Ashvin Nair, Shikhar Bahl, Sergey Levine. arXiv preprint, 2019.
 
