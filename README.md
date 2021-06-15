@@ -42,60 +42,6 @@ Implemented algorithms:
 
 To get started, checkout the example scripts, linked above.
 
-## What's New
-### Version 0.2
-
-#### 04/25/2019
- - Use new `multiworld` code that requires explicit environment registration.
- - Make installation easier by adding `setup.py` and using default `conf.py`.
-
-#### 04/16/2019
- - Log how many train steps were called
- - Log `env_info` and `agent_info`.
-
-#### 04/05/2019-04/15/2019
- - Add rendering
- - Fix SAC bug to account for future entropy (#41, #43)
- - Add online algorithm mode (#42)
-
-#### 04/05/2019
-
-The initial release for 0.2 has the following major changes:
- - Remove `Serializable` class and use default pickle scheme.
- - Remove `PyTorchModule` class and use native `torch.nn.Module` directly.
- - Switch to batch-style training rather than online training.
-   - Makes code more amenable to parallelization.
-   - Implementing the online-version is straightforward.
- - Refactor training code to be its own object, rather than being integrated 
- inside of `RLAlgorithm`.
- - Refactor sampling code to be its own object, rather than being integrated
- inside of `RLAlgorithm`.
- - Implement [Skew-Fit: 
-State-Covering Self-Supervised Reinforcement Learning](https://arxiv.org/abs/1903.03698),
-a method for performing goal-directed exploration to maximize the entropy of 
-visited states.
- - Update soft actor-critic to more closely match TensorFlow implementation:
-   - Rename `TwinSAC` to just `SAC`.
-   - Only have Q networks.
-   - Remove unnecessary policy regualization terms.
-   - Use numerically stable Jacobian computation.
-
-Overall, the refactors are intended to make the code more modular and 
-readable than the previous versions.
-
-### Version 0.1
-#### 12/04/2018
- - Add RIG implementation
-
-#### 12/03/2018
- - Add HER implementation
- - Add doodad support
-
-#### 10/16/2018
- - Upgraded to PyTorch v0.4
- - Added Twin Soft Actor Critic Implementation
- - Various small refactor (e.g. logger, evaluate code)
-
 ## Installation
 
 1. Install and use the included Ananconda environment
