@@ -1,9 +1,9 @@
 # RLkit-PMOE
 Reinforcement learning framework and algorithms implemented in PyTorch.
 
-In addition, this repo includes the official implementation of Probabilistic Mixture-of-Experts (PMOE) on RLkit.
+<font color=#A52A2A>In addition, this repo includes the official implementation of Probabilistic Mixture-of-Experts (PMOE) based on [RLkit](https://github.com/vitchyr/rlkit).
 Package dependency is the same as the origin RLkit.
-Thanks to all the contributors of RLkit.
+Thanks to all the contributors of RLkit.</font>
 
 Implemented algorithms:
  - Probabilistic Mixture-of-Experts (PMOE)
@@ -48,17 +48,20 @@ To get started, checkout the example scripts, linked above.
 ```
 $ conda env create -f environment/[linux-cpu|linux-gpu|mac]-env.yml
 $ source activate rlkit
-(rlkit) $ python examples/ddpg.py
+(rlkit) $ python examples/PMOEsac.py
 ```
 Choose the appropriate `.yml` file for your system.
 These Anaconda environments use MuJoCo 1.5 and gym 0.10.5.
 You'll need to [get your own MuJoCo key](https://www.roboti.us/license.html) if you want to use MuJoCo.
 
-2. Add this repo directory to your `PYTHONPATH` environment variable or simply
+2. (**Not** Recommended) Add this repo directory to your `PYTHONPATH` environment variable or simply
 run:
 ```
 pip install -e .
 ```
+Replace all the `rlkit` import in your code to `rlkit_pmoe`.
+
+<font color=#A52A2A>Notably, we **recommend** you to copy the `./rlkit` directory into your working directory for the reason of making the minimal modification to your code.</font>
 
 3. (Optional) Copy `conf.py` to `conf_private.py` and edit to override defaults:
 ```
@@ -110,9 +113,9 @@ depending on whether or not the policy is goal-conditioned.
 
 If you have rllab installed, you can also visualize the results
 using `rllab`'s viskit, described at
-the bottom of [this page](http://rllab.readthedocs.io/en/latest/user/cluster.html)
+the bottom of [this page](http://rllab.readthedocs.io/en/latest/user/cluster.html).
 
-tl;dr run
+Run
 
 ```bash
 python rllab/viskit/frontend.py LOCAL_LOG_DIR/<exp_prefix>/
