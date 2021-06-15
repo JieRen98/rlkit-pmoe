@@ -2,7 +2,7 @@
 Reinforcement learning framework and algorithms implemented in PyTorch.
 
 <font color=#A52A2A>In addition, this repo includes the official implementation of Probabilistic Mixture-of-Experts (PMOE) based on [RLkit](https://github.com/vitchyr/rlkit).
-Package dependency is the same as the origin RLkit.
+Package dependency is the same as the origin RLkit. The interface keeps consistency to RLkit to enjoy the goodness of RLkit.
 Thanks to all the contributors of RLkit.</font>
 
 Implemented algorithms:
